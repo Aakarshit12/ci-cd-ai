@@ -7,6 +7,7 @@ from app.core.logging import setup_logging
 from app.core.errors import db_exception_handler
 from app.api import requests
 from app.core.database import Base, engine
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.api import ai
 
@@ -14,6 +15,17 @@ setup_logging()
 
 app = FastAPI(title="AI CI/CD Backend")
 app.include_router(ai.router)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",  # React (Vite)
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 # register exception handler
 app.add_exception_handler(SQLAlchemyError, db_exception_handler)

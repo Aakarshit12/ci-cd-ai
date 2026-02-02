@@ -33,3 +33,4 @@ Thumbs.db
 # Coverage / cache
 .coverage
 pytest_cache/
+frontend/.env
