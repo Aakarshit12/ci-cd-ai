@@ -8,9 +8,12 @@ from app.core.errors import db_exception_handler
 from app.api import requests
 from app.core.database import Base, engine
 
+from app.api import ai
+
 setup_logging()
 
 app = FastAPI(title="AI CI/CD Backend")
+app.include_router(ai.router)
 
 # register exception handler
 app.add_exception_handler(SQLAlchemyError, db_exception_handler)
