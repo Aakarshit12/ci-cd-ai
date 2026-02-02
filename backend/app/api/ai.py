@@ -7,7 +7,7 @@ from app.core.ai import analyze_text
 from app.core.cache import redis_client
 
 router = APIRouter(prefix="/ai", tags=["ai"])
-
+# 10 min
 CACHE_TTL = 600  # seconds
 
 
