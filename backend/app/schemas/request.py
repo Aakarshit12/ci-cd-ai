@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field,EmailStr
 from datetime import datetime
 
 class RequestCreate(BaseModel):
@@ -17,3 +17,10 @@ class RequestResponse(BaseModel):
 
     class Config:
         from_attributes = True
+class UserCreate(BaseModel):
+    email: EmailStr
+    password: str
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
