@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import Login from "./pages/Login";
+import Signup from "./pages/Signup";
 import ProtectedLayout from "./layouts/ProtectedLayout";
 import Dashboard from "./pages/Dashboard";
 import { getMe } from "@/services/auth";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true); // 🔹 ADD
+  const [loading, setLoading] = useState(true);
 
-  // 🔹 VALIDATE TOKEN
   useEffect(() => {
     const token = localStorage.getItem("token");
 
@@ -17,10 +17,9 @@ function App() {
       return;
     }
 
+    // validate token with backend
     getMe()
-      .then(() => {
-        setIsAuthenticated(true);
-      })
+      .then(() => setIsAuthenticated(true))
       .catch(() => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
@@ -29,7 +28,7 @@ function App() {
       .finally(() => setLoading(false));
   }, []);
 
-  if (loading) return null; // or spinner
+  if (loading) return null;
 
   if (!isAuthenticated) {
     return <Login onLogin={() => setIsAuthenticated(true)} />;

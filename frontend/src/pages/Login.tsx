@@ -1,6 +1,6 @@
 import { useState } from "react";
 import FaultyTerminal from "../components/FaultyTerminalWrapper";
-import { loginUser, signupUser } from "@/services/auth";
+import { loginUser, signupUser } from "../services/auth";
 
 // Stable props for background so it doesn't re-render on every keystroke
 const LOGIN_BG_GRID_MUL: [number, number] = [2, 1];
