@@ -13,6 +13,8 @@ from app.models.user import User   # ✅ REQUIRED (registers model)
 from app.api import requests
 from app.api import ai
 from app.api.auth import router as auth_router
+from app.core.cache import redis_client
+
 
 setup_logging()
 
@@ -34,6 +36,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.get("/redis-test")
+def redis_test():
+    redis_client.set("test_key", "working")
+    value = redis_client.get("test_key")
+    return {"redis_value": value}
 
 app.add_exception_handler(SQLAlchemyError, db_exception_handler)
 
