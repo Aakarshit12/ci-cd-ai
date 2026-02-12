@@ -14,7 +14,7 @@ from app.core.database import get_db
 from app.models.user import User
 
 pwd_context = CryptContext(
-    schemes=["bcrypt_sha256"],
+    schemes=["pbkdf2_sha256"],
     deprecated="auto",
 )
 

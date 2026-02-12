@@ -27,6 +27,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -36,6 +38,7 @@ app.add_middleware(
 app.add_exception_handler(SQLAlchemyError, db_exception_handler)
 
 logger = logging.getLogger("app")
+
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -54,8 +57,35 @@ async def log_requests(request: Request, call_next):
     )
     return response
 
+
+def init_db(max_retries: int = 10, delay_seconds: float = 2.0) -> None:
+    """
+    Ensure the database is reachable before serving requests.
+    Retries a few times instead of crashing the container if Postgres isn't ready yet.
+    """
+    attempt = 0
+    while attempt < max_retries:
+        try:
+            Base.metadata.create_all(bind=engine)
+            logger.info("Database initialized successfully")
+            return
+        except SQLAlchemyError as exc:
+            attempt += 1
+            logger.warning(
+                "Database initialization failed (attempt %s/%s): %s",
+                attempt,
+                max_retries,
+                exc,
+            )
+            time.sleep(delay_seconds)
+
+    logger.error("Database initialization failed after %s attempts. Exiting.", max_retries)
+    raise RuntimeError("Could not initialize database")
+
+
 # 🔥 MUST RUN AFTER MODEL IMPORT
-Base.metadata.create_all(bind=engine)
+init_db()
+
 
 @app.get("/health")
 def health():

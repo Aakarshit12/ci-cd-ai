@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import Login from "./pages/Login";
-import Signup from "./pages/Signup";
 import ProtectedLayout from "./layouts/ProtectedLayout";
 import Dashboard from "./pages/Dashboard";
 import { getMe } from "@/services/auth";

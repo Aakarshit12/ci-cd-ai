@@ -2,7 +2,7 @@ import { api } from "../lib/api";
 
 
 export const registerUser = async (email: string, password: string) => {
-  const res = await api.post("/auth/register", {
+  const res = await api.post("/auth/signup", {
     email,
     password,
   });
