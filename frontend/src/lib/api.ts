@@ -1,7 +1,7 @@
 import axios from "axios";
 
 // TEMP: debug what base URL gets baked into the bundle
-// eslint-disable-next-line no-console
+
 console.log("API BASE URL:", import.meta.env.VITE_API_BASE_URL);
 
 export const api = axios.create({

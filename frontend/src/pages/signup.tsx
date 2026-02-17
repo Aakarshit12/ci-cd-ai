@@ -29,9 +29,15 @@ export default function Signup({ onLogin }: SignupProps) {
 
       // 4️⃣ enter app
       onLogin();
-    } catch (err: any) {
-      setError(err?.response?.data?.detail || "Signup failed");
-    } finally {
+    }  catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("Signup failed");
+      }
+    }
+    
+     finally {
       setLoading(false);
     }
   };

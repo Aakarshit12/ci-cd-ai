@@ -5,31 +5,31 @@ import Dashboard from "./pages/Dashboard";
 import { getMe } from "@/services/auth";
 
 function App() {
+  const token = localStorage.getItem("token");
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(token));
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    if (!token) return;
 
-    if (!token) {
-      setLoading(false);
-      return;
-    }
-
-    // validate token with backend
     getMe()
-      .then(() => setIsAuthenticated(true))
+      .then(() => {
+        setIsAuthenticated(true);
+      })
       .catch(() => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         setIsAuthenticated(false);
       })
-      .finally(() => setLoading(false));
-  }, []);
+      .finally(() => {
+        setLoading(false);
+      });
+  }, [token]);
 
   if (loading) return null;
 
-  if (!isAuthenticated) {
+  if (!token || !isAuthenticated) {
     return <Login onLogin={() => setIsAuthenticated(true)} />;
   }
 
