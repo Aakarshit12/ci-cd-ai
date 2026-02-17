@@ -4,42 +4,59 @@ services:
   db:
     image: postgres:15
     container_name: db
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: Aakarshit12
-      POSTGRES_DB: ci_cd_db
-    ports:
-      - "5432:5432"
+    restart: unless-stopped
+    env_file:
+      - .env
     volumes:
       - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7
     container_name: redis
-    ports:
-      - "6379:6379"
+    restart: unless-stopped
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     build: ./backend
     container_name: backend
-    environment:
-      - DATABASE_URL=postgresql://postgres:Aakarshit12@db:5432/ci_cd_db
-      - REDIS_URL=redis://redis:6379/0
+    restart: unless-stopped
+    env_file:
+      - .env
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
       - "8000:8000"
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
 
   frontend:
     build: ./frontend
     container_name: frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
     ports:
       - "3000:80"
-    depends_on:
-      - backend
 
 volumes:
   db_data:
