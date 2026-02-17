@@ -25,6 +25,10 @@ jobs:
         ports:
           - 6379:6379
 
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/test_db
+      REDIS_URL: redis://redis:6379/0
+
     steps:
       - uses: actions/checkout@v4
 
