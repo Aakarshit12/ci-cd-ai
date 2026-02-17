@@ -8,7 +8,4 @@ def analyze_text(text: str) -> dict:
     else:
         sentiment = "neutral"
 
-    return {
-        "sentiment": sentiment,
-        "confidence": 0.85
-    }
+    return {"sentiment": sentiment, "confidence": 0.85}

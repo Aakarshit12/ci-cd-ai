@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
 from sqlalchemy.sql import func
 from app.core.database import Base
 
+
 class Request(Base):
     __tablename__ = "requests"
 

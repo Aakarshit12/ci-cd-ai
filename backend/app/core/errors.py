@@ -5,6 +5,7 @@ import logging
 
 logger = logging.getLogger("app")
 
+
 async def db_exception_handler(request: Request, exc: SQLAlchemyError):
     logger.error("Database error", exc_info=exc)
     return JSONResponse(

@@ -6,7 +6,7 @@ from app.schemas.ai import AIRequest, AIResponse
 from app.core.ai import analyze_text
 from app.core.cache import redis_client
 from app.models.user import User
-from app.core.deps import get_current_user   # ✅ FIX
+from app.core.deps import get_current_user  # ✅ FIX
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 

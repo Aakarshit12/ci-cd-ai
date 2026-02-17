@@ -11,21 +11,17 @@ router = APIRouter(prefix="/requests", tags=["requests"])
 CACHE_KEY = "requests:all"
 CACHE_TTL = 30  # seconds
 
+
 @router.post("/", response_model=RequestResponse)
-def create_request(
-    payload: RequestCreate,
-    db: Session = Depends(get_db)
-):
-    req = Request(
-        input_text=payload.input_text,
-        output_text="mock-output"
-    )
+def create_request(payload: RequestCreate, db: Session = Depends(get_db)):
+    req = Request(input_text=payload.input_text, output_text="mock-output")
     db.add(req)
     db.commit()
     db.refresh(req)
 
     redis_client.delete(CACHE_KEY)
     return req
+
 
 @router.get("/", response_model=list[RequestResponse])
 def list_requests(db: Session = Depends(get_db)):

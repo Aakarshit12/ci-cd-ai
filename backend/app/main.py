@@ -8,7 +8,7 @@ from app.core.logging import setup_logging
 from app.core.errors import db_exception_handler
 from app.core.database import Base, engine
 
-from app.models.user import User   # ✅ REQUIRED (registers model)
+from app.models.user import User  # ✅ REQUIRED (registers model)
 
 from app.api import requests
 from app.api import ai
@@ -36,11 +36,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 @app.get("/redis-test")
 def redis_test():
     redis_client.set("test_key", "working")
     value = redis_client.get("test_key")
     return {"redis_value": value}
+
 
 app.add_exception_handler(SQLAlchemyError, db_exception_handler)
 
@@ -86,7 +89,9 @@ def init_db(max_retries: int = 10, delay_seconds: float = 2.0) -> None:
             )
             time.sleep(delay_seconds)
 
-    logger.error("Database initialization failed after %s attempts. Exiting.", max_retries)
+    logger.error(
+        "Database initialization failed after %s attempts. Exiting.", max_retries
+    )
     raise RuntimeError("Could not initialize database")
 
 

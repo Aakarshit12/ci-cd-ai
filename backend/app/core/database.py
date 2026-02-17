@@ -4,12 +4,14 @@ from app.core.config import DATABASE_URL
 
 from sqlalchemy.orm import Session
 
+
 def get_db() -> Session:
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)

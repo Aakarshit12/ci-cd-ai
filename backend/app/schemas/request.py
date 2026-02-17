@@ -1,13 +1,12 @@
-from pydantic import BaseModel, Field,EmailStr
+from pydantic import BaseModel, Field, EmailStr
 from datetime import datetime
+
 
 class RequestCreate(BaseModel):
     input_text: str = Field(
-        ...,
-        min_length=1,
-        max_length=500,
-        description="User input text"
+        ..., min_length=1, max_length=500, description="User input text"
     )
+
 
 class RequestResponse(BaseModel):
     id: int
@@ -17,9 +16,12 @@ class RequestResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
+
 
 class UserLogin(BaseModel):
     email: EmailStr
