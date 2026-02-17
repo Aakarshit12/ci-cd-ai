@@ -25,7 +25,9 @@ def test_redis_client_uses_configured_url(monkeypatch):
         assert url.startswith("redis://")
         return fake
 
-    monkeypatch.setattr(cache.redis, "Redis", type("R", (), {"from_url": staticmethod(_fake_from_url)}))
+    monkeypatch.setattr(
+        cache.redis, "Redis", type("R", (), {"from_url": staticmethod(_fake_from_url)})
+    )
 
     cache.redis_client.set("k", "v")
     assert cache.redis_client.get("k") == "v"

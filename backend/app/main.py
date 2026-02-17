@@ -105,8 +105,6 @@ def init_db(max_retries: int = 10, delay_seconds: float = 2.0) -> None:
 # 🔥 MUST RUN AFTER MODEL IMPORT
 
 
-
-
 @app.on_event("startup")
 def startup_event():
     # Avoid touching the real database during unit tests
@@ -114,7 +112,6 @@ def startup_event():
     # run with TESTING unset/false to exercise init_db().
     if not is_testing():
         init_db()
-
 
 
 @app.get("/health")
