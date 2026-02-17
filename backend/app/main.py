@@ -8,7 +8,7 @@ from app.core.logging import setup_logging
 from app.core.errors import db_exception_handler
 from app.core.database import Base, engine
 
-from app.models.user import User  # ✅ REQUIRED (registers model)
+# from app.models.user import User  # ✅ REQUIRED (registers model)
 
 from app.api import requests
 from app.api import ai
