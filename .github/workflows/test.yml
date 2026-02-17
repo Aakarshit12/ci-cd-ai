@@ -7,7 +7,48 @@ on:
     branches: [ main ]
 
 jobs:
-  test:
+
+  # -------------------------
+  # 1️⃣ UNIT TESTS (FAST)
+  # -------------------------
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+
+    env:
+      TESTING: "1"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements.txt
+          pip install pytest pytest-cov fakeredis
+
+      - name: Run Unit Tests with Coverage
+        run: |
+          cd backend
+          pytest tests/unit \
+            --cov=app \
+            --cov-report=term \
+            --cov-report=xml \
+            --cov-fail-under=75
+
+
+  # -------------------------
+  # 2️⃣ INTEGRATION TESTS
+  # -------------------------
+  integration-tests:
+    name: Integration Tests
     runs-on: ubuntu-latest
 
     services:
@@ -36,11 +77,8 @@ jobs:
           --health-retries=5
 
     env:
-      # Application config for integration-style behaviour if you add such tests.
       DATABASE_URL: postgresql://postgres:postgres@localhost:5432/ci_cd_db
       REDIS_URL: redis://localhost:6379/0
-      # Tell the app and tests to run in test mode so startup init_db is skipped
-      TESTING: "1"
 
     steps:
       - name: Checkout repository
@@ -56,10 +94,9 @@ jobs:
         run: |
           cd backend
           pip install -r requirements.txt
-          pip install pytest pytest-cov
+          pip install pytest
 
-      - name: Run pytest with coverage
+      - name: Run Integration Tests
         run: |
           cd backend
-          pytest --cov=app --cov-report=term
-
+          pytest tests/integration
