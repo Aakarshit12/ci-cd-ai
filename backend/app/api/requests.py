@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.core.deps import get_db
 from app.models.request import Request
-from app.core.cache import redis_client
+from app.core import cache
 from app.schemas.request import RequestCreate, RequestResponse
 import json
 
@@ -19,13 +19,13 @@ def create_request(payload: RequestCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(req)
 
-    redis_client.delete(CACHE_KEY)
+    cache.redis_client.delete(CACHE_KEY)
     return req
 
 
 @router.get("/", response_model=list[RequestResponse])
 def list_requests(db: Session = Depends(get_db)):
-    cached = redis_client.get(CACHE_KEY)
+    cached = cache.redis_client.get(CACHE_KEY)
     if cached:
         return json.loads(cached)
 
@@ -40,5 +40,5 @@ def list_requests(db: Session = Depends(get_db)):
         for r in data
     ]
 
-    redis_client.setex(CACHE_KEY, CACHE_TTL, json.dumps(result))
+    cache.redis_client.setex(CACHE_KEY, CACHE_TTL, json.dumps(result))
     return result

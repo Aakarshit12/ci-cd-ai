@@ -9,7 +9,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.api import ai
 from app.api import requests
 from app.api.auth import router as auth_router
-from app.core.cache import redis_client
+from app.core import cache
 from app.core.database import Base, engine
 from app.core.errors import db_exception_handler
 from app.core.logging import setup_logging
@@ -39,8 +39,8 @@ app.add_middleware(
 
 @app.get("/redis-test")
 def redis_test():
-    redis_client.set("test_key", "working")
-    value = redis_client.get("test_key")
+    cache.redis_client.set("test_key", "working")
+    value = cache.redis_client.get("test_key")
     return {"redis_value": value}
 
 

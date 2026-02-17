@@ -14,4 +14,3 @@ def test_analyze_text_negative():
 def test_analyze_text_neutral():
     result = analyze_text("Just an ordinary statement")
     assert result["sentiment"] == "neutral"
-

@@ -5,7 +5,9 @@ from app.core import deps, security
 from app.models.user import User
 
 
-def _create_user(db: Session, email: str = "user@example.com", password: str = "password"):
+def _create_user(
+    db: Session, email: str = "user@example.com", password: str = "password"
+):
     user = User(email=email, hashed_password=security.hash_password(password))
     db.add(user)
     db.commit()
@@ -31,4 +33,3 @@ def test_get_current_user_invalid_token_raises(db: Session):
         assert exc.status_code == 401
     else:
         assert False, "Expected HTTPException for invalid token"
-

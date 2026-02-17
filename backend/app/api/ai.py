@@ -4,7 +4,7 @@ import hashlib
 
 from app.schemas.ai import AIRequest, AIResponse
 from app.core.ai import analyze_text
-from app.core.cache import redis_client
+from app.core import cache
 from app.models.user import User
 from app.core.deps import get_current_user  # ✅ FIX
 
@@ -31,10 +31,10 @@ def secure_test(current_user: User = Depends(get_current_user)):
 def analyze(payload: AIRequest):
     key = cache_key(payload.text)
 
-    cached = redis_client.get(key)
+    cached = cache.redis_client.get(key)
     if cached:
         return json.loads(cached)
 
     result = analyze_text(payload.text)
-    redis_client.setex(key, CACHE_TTL, json.dumps(result))
+    cache.redis_client.setex(key, CACHE_TTL, json.dumps(result))
     return result
