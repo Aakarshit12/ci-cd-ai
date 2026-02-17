@@ -1,19 +1,18 @@
 from fastapi import FastAPI, Request
-import time
 import logging
-from sqlalchemy.exc import SQLAlchemyError
+import os
+import time
+
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.exc import SQLAlchemyError
 
-from app.core.logging import setup_logging
-from app.core.errors import db_exception_handler
-from app.core.database import Base, engine
-
-# from app.models.user import User  # ✅ REQUIRED (registers model)
-
-from app.api import requests
 from app.api import ai
+from app.api import requests
 from app.api.auth import router as auth_router
 from app.core.cache import redis_client
+from app.core.database import Base, engine
+from app.core.errors import db_exception_handler
+from app.core.logging import setup_logging
 
 
 setup_logging()
@@ -48,6 +47,14 @@ def redis_test():
 app.add_exception_handler(SQLAlchemyError, db_exception_handler)
 
 logger = logging.getLogger("app")
+
+
+def is_testing() -> bool:
+    """
+    Centralised check for test mode so that env handling
+    is consistent across local runs and CI.
+    """
+    return os.getenv("TESTING", "").lower() in {"1", "true", "yes"}
 
 
 @app.middleware("http")
@@ -98,9 +105,16 @@ def init_db(max_retries: int = 10, delay_seconds: float = 2.0) -> None:
 # 🔥 MUST RUN AFTER MODEL IMPORT
 
 
+
+
 @app.on_event("startup")
 def startup_event():
-    init_db()
+    # Avoid touching the real database during unit tests
+    # (both locally and in CI) – integration tests can
+    # run with TESTING unset/false to exercise init_db().
+    if not is_testing():
+        init_db()
+
 
 
 @app.get("/health")

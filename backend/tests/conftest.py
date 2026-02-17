@@ -1,11 +1,17 @@
+import os
+
 import pytest
+from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from fastapi.testclient import TestClient
 
-from app.main import app
 from app.core.database import Base, get_db
+from app.main import app
 
+# Ensure the application knows it's running under unit tests
+# so that expensive startup behaviour (like init_db with
+# a real Postgres engine) is skipped.
+os.environ.setdefault("TESTING", "1")
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
@@ -35,10 +41,7 @@ def db():
 @pytest.fixture(scope="function")
 def client(db):
     def override_get_db():
-        try:
-            yield db
-        finally:
-            pass
+        yield db
 
     app.dependency_overrides[get_db] = override_get_db
 

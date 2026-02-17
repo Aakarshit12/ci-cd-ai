@@ -1,10 +1,7 @@
 from fastapi.testclient import TestClient
-from app.main import app
-
-client = TestClient(app)
 
 
-def test_login_invalid_credentials():
+def test_login_invalid_credentials(client: TestClient):
     response = client.post(
         "/auth/login",
         json={"email": "wrong@test.com", "password": "wrong"},
