@@ -98,12 +98,9 @@ def init_db(max_retries: int = 10, delay_seconds: float = 2.0) -> None:
 # 🔥 MUST RUN AFTER MODEL IMPORT
 
 
-
-
 @app.on_event("startup")
 def startup_event():
     init_db()
-
 
 
 @app.get("/health")

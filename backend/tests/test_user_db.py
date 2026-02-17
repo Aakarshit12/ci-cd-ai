@@ -1,6 +1,6 @@
 def test_create_user(client):
     response = client.post(
-        "/auth/register",
+        "/auth/signup",
         json={"email": "test@test.com", "password": "123456"},
     )
 

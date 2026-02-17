@@ -8,6 +8,7 @@ on:
 
 jobs:
   test:
+    name: Run Backend Tests
     runs-on: ubuntu-latest
 
     services:
@@ -19,6 +20,11 @@ jobs:
           POSTGRES_DB: test_db
         ports:
           - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
       redis:
         image: redis:7
@@ -30,11 +36,14 @@ jobs:
       REDIS_URL: redis://redis:6379/0
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
+          cache: "pip"
 
       - name: Install dependencies
         run: |
@@ -42,7 +51,14 @@ jobs:
           pip install -r requirements.txt
           pip install pytest pytest-cov
 
-      - name: Run tests
+      - name: Wait for Postgres
+        run: |
+          until pg_isready -h postgres -U postgres; do
+            echo "Waiting for Postgres..."
+            sleep 2
+          done
+
+      - name: Run tests with coverage
         run: |
           cd backend
-          pytest --cov=app --cov-report=term
+          pytest --cov=app --cov-report=term --cov-report=xml
