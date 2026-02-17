@@ -21,4 +21,3 @@ def test_create_and_list_requests(client: TestClient):
     # Second list – should exercise the cache path
     list_resp_cached = client.get("/requests/")
     assert list_resp_cached.status_code == 200
-

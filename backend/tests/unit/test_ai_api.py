@@ -11,4 +11,3 @@ def test_ai_analyze_uses_cache(monkeypatch, client: TestClient):
     body = response.json()
     # Expected keys from AIResponse model
     assert "sentiment" in body or "label" in body or body != {}
-

@@ -13,4 +13,3 @@ def test_create_access_token_contains_sub_and_exp():
     # Basic smoke check – token is a non-empty string
     assert isinstance(token, str)
     assert token
-

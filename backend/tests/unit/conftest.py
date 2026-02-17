@@ -1,10 +1,12 @@
 import os
 
+import fakeredis
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
+from app.core import cache
 from app.core.database import Base, get_db
 from app.main import app
 
@@ -25,6 +27,17 @@ TestingSessionLocal = sessionmaker(
     autoflush=False,
     bind=engine,
 )
+
+
+@pytest.fixture(autouse=True)
+def fake_redis(monkeypatch):
+    """
+    Use an in-memory fakeredis client for all unit tests so that
+    no real Redis server is ever contacted.
+    """
+    fake = fakeredis.FakeRedis(decode_responses=True)
+    monkeypatch.setattr(cache, "redis_client", fake)
+    yield
 
 
 @pytest.fixture(scope="function")
