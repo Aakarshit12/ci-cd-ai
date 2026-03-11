@@ -17,6 +17,9 @@
     # ---------- Production Stage ----------
     FROM nginx:alpine
     
+    # Upgrade packages to patch any vulnerabilities in the base image (e.g., zlib CVE-2026-22184)
+    RUN apk upgrade --no-cache
+    
     # Remove default nginx config
     RUN rm -rf /usr/share/nginx/html/*
     
