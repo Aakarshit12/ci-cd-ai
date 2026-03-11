@@ -10,17 +10,24 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "axios": "^1.13.4",
+    "axios": "^1.13.5",
+    "body-parser": "^1.20.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "jsonwebtoken": "^9.0.0",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.563.0",
+    "moment": "^2.29.4",
     "ogl": "^1.0.11",
+    "path-to-regexp": "^3.3.0",
+    "qs": "^6.10.3",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^6.30.3",
-    "tailwind": "^4.0.0",
+    "tailwind": "^2.3.1",
     "tailwind-merge": "^3.4.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "ws": "^8.17.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
