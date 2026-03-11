@@ -23,6 +23,9 @@
     ENV PYTHONDONTWRITEBYTECODE=1
     ENV PYTHONUNBUFFERED=1
     
+    # Upgrade core python packages to patch vulnerabilities
+    RUN pip install --no-cache-dir --upgrade pip setuptools wheel
+    
     WORKDIR /app
     
     # Copy installed dependencies
