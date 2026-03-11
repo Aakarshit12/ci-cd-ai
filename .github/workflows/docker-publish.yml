@@ -41,6 +41,22 @@ jobs:
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Build and load image into standard Docker daemon (for scanning)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./frontend
+          load: true
+          tags: frontend-local:scan
+
+      - name: Scan the local image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'frontend-local:scan'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          ignore-unfixed: true
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
@@ -77,6 +93,22 @@ jobs:
             type=ref,event=branch
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and load image into standard Docker daemon (for scanning)
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          load: true
+          tags: backend-local:scan
+
+      - name: Scan the local image with Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'backend-local:scan'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'
+          ignore-unfixed: true
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
