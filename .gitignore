@@ -34,3 +34,4 @@ Thumbs.db
 .coverage
 pytest_cache/
 frontend/.env
+gateway/model/
