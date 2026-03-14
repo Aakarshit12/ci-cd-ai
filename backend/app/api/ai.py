@@ -12,8 +12,7 @@ from prometheus_client import Counter
 router = APIRouter(prefix="/ai", tags=["ai"])
 
 ai_analysis_requests_total = Counter(
-    "ai_analysis_requests_total",
-    "Total number of AI text analysis requests processed"
+    "ai_analysis_requests_total", "Total number of AI text analysis requests processed"
 )
 
 # 10 min
