@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+onnxruntime
+scikit-learn
+skl2onnx
+redis
+psycopg2
+prometheus-client
+httpx
