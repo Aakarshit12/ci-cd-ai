@@ -4,6 +4,7 @@ onnxruntime
 scikit-learn
 skl2onnx
 redis
-psycopg2
+psycopg2-binary
 prometheus-client
 httpx
+numpy

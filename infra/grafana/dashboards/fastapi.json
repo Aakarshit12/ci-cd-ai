@@ -1,0 +1,79 @@
+{
+    "title": "FastAPI AI Backend Metrics",
+    "timezone": "browser",
+    "panels": [
+        {
+            "title": "API Request Rate (per second)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 0
+            },
+            "targets": [
+                {
+                    "expr": "sum(rate(http_requests_total[5m]))",
+                    "legendFormat": "Total Requests/s",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "title": "API Request Latency (95th Percentile)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 0
+            },
+            "targets": [
+                {
+                    "expr": "histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le))",
+                    "legendFormat": "p95 Latency",
+                    "refId": "A"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "s"
+                }
+            }
+        },
+        {
+            "title": "Errors (4xx, 5xx Rate)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 8
+            },
+            "targets": [
+                {
+                    "expr": "sum(rate(http_requests_total{status=~\"[45].*\"}[5m]))",
+                    "legendFormat": "Errors/s",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "title": "Custom: Total AI Analysis Requests",
+            "type": "stat",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 8
+            },
+            "targets": [
+                {
+                    "expr": "sum(ai_analysis_requests_total)",
+                    "legendFormat": "Total Analysis Requests",
+                    "refId": "A"
+                }
+            ]
+        }
+    ]
+}

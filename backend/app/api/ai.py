@@ -7,8 +7,14 @@ from app.core.ai import analyze_text
 from app.core import cache
 from app.models.user import User
 from app.core.deps import get_current_user  # ✅ FIX
+from prometheus_client import Counter
 
 router = APIRouter(prefix="/ai", tags=["ai"])
+
+ai_analysis_requests_total = Counter(
+    "ai_analysis_requests_total",
+    "Total number of AI text analysis requests processed"
+)
 
 # 10 min
 CACHE_TTL = 600  # seconds
@@ -29,6 +35,7 @@ def secure_test(current_user: User = Depends(get_current_user)):
 
 @router.post("/analyze", response_model=AIResponse)
 def analyze(payload: AIRequest):
+    ai_analysis_requests_total.inc()
     key = cache_key(payload.text)
 
     cached = cache.redis_client.get(key)

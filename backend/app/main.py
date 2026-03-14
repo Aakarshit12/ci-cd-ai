@@ -13,11 +13,14 @@ from app.core import cache
 from app.core.database import Base, engine
 from app.core.errors import db_exception_handler
 from app.core.logging import setup_logging
-
+from prometheus_fastapi_instrumentator import Instrumentator
 
 setup_logging()
 
 app = FastAPI(title="AI CI/CD Backend")
+
+# Instrument the app to expose default Prometheus metrics
+Instrumentator().instrument(app).expose(app)
 
 app.include_router(auth_router)
 app.include_router(ai.router)

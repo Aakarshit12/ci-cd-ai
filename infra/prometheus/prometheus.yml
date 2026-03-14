@@ -1,0 +1,9 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'fastapi-backend'
+    scrape_interval: 5s
+    # Prometheus will scrape the metrics endpoint on the backend container
+    static_configs:
+      - targets: ['backend:8000']
