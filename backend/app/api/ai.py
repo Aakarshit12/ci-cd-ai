@@ -1,13 +1,14 @@
-from fastapi import APIRouter, Depends
-import json
 import hashlib
+import json
 
-from app.schemas.ai import AIRequest, AIResponse
-from app.core.ai import analyze_text
-from app.core import cache
-from app.models.user import User
-from app.core.deps import get_current_user  # ✅ FIX
+from fastapi import APIRouter, Depends
 from prometheus_client import Counter
+
+from app.core import cache
+from app.core.ai import analyze_text
+from app.core.deps import get_current_user  # ✅ FIX
+from app.models.user import User
+from app.schemas.ai import AIRequest, AIResponse
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 

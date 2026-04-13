@@ -1,7 +1,8 @@
+import logging
+
 from fastapi import Request
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
-import logging
 
 logger = logging.getLogger("app")
 

@@ -1,5 +1,6 @@
-import redis
 import os
+
+import redis
 
 
 def test_real_redis_connection():

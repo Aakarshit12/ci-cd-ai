@@ -1,22 +1,22 @@
-from fastapi import FastAPI, Request
 import logging
 import os
+import sys
 import time
 
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_fastapi_instrumentator import Instrumentator
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.api import ai
-from app.api import requests
+from app.api import ai, requests
 from app.api.auth import router as auth_router
 from app.core import cache
 from app.core.database import Base, engine
 from app.core.errors import db_exception_handler
 from app.core.logging import setup_logging
-from prometheus_fastapi_instrumentator import Instrumentator
-import sys, os
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from gateway.middleware import GatewayMiddleware
+
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 setup_logging()
 
@@ -43,6 +43,7 @@ app.add_middleware(
 )
 
 app.add_middleware(GatewayMiddleware)
+
 
 @app.get("/redis-test")
 def redis_test():

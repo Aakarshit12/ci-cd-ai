@@ -1,10 +1,12 @@
+import json
+
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+
+from app.core import cache
 from app.core.deps import get_db
 from app.models.request import Request
-from app.core import cache
 from app.schemas.request import RequestCreate, RequestResponse
-import json
 
 router = APIRouter(prefix="/requests", tags=["requests"])
 

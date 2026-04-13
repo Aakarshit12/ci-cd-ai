@@ -23,6 +23,9 @@
     ENV PYTHONDONTWRITEBYTECODE=1
     ENV PYTHONUNBUFFERED=1
     
+    # Update OS packages to patch vulnerabilities (like openssl)
+    RUN apt-get update && apt-get upgrade -y && rm -rf /var/lib/apt/lists/*
+    
     # Upgrade core python packages to patch vulnerabilities
     RUN pip install --no-cache-dir --upgrade pip setuptools wheel
     
