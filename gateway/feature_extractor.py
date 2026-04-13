@@ -1,63 +1,58 @@
 import numpy as np
 import hashlib
-import datetime
+from datetime import datetime
 from fastapi import Request
 
-def deterministic_hash(value: str, modulo: int) -> int:
-    """Returns a deterministic integer hash of a string modulo the given integer."""
-    if not value:
-        return 0
-    # Use MD5 and convert hex to integer for a deterministic, platform-independent hash
-    return int(hashlib.md5(value.encode('utf-8')).hexdigest(), 16) % modulo
-
 def extract_features(request: Request) -> np.ndarray:
-    """
-    Extracts exactly 10 numerical features from a FastAPI Request.
-    Returns: A numpy array of dtype np.float32.
-    """
     # 1. ip_hash
-    client_host = request.client.host if request.client else "127.0.0.1"
-    ip_hash = deterministic_hash(client_host, 100000)
+    client_ip = getattr(request.client, "host", "127.0.0.1") if request.client else "127.0.0.1"
+    ip_hash = int(hashlib.md5(client_ip.encode()).hexdigest(), 16) % 100000
     
     # 2. endpoint_hash
-    endpoint_hash = deterministic_hash(request.url.path, 10000)
+    path = getattr(request.url, "path", "") if hasattr(request, "url") else ""
+    endpoint_hash = int(hashlib.md5(path.encode()).hexdigest(), 16) % 10000
     
     # 3. http_method
-    method = request.method.upper()
+    method = request.method.upper() if hasattr(request, "method") else "GET"
     method_map = {"GET": 0, "POST": 1, "PUT": 2, "DELETE": 3, "PATCH": 4}
     http_method = method_map.get(method, 5)
     
-    # 4. payload_size_bytes
-    content_length = request.headers.get("content-length", "0")
+    # 4. payload_size
+    headers = getattr(request, "headers", {})
     try:
-        payload_size_bytes = int(content_length)
-    except ValueError:
-        payload_size_bytes = 0
+        # Handle case-insensitivity manually as headers could be a regular dict in tests
+        cl = headers.get("Content-Length", headers.get("content-length", 0))
+        payload_size = int(cl)
+    except (ValueError, TypeError):
+        payload_size = 0
         
-    # 5. hour_of_day & 6. is_weekend
-    now_utc = datetime.datetime.now(datetime.timezone.utc)
-    hour_of_day = now_utc.hour
-    is_weekend = 1 if now_utc.weekday() >= 5 else 0
+    # 5. hour_of_day
+    now = datetime.utcnow()
+    hour_of_day = now.hour
+    
+    # 6. is_weekend
+    is_weekend = 1 if now.weekday() >= 5 else 0
     
     # 7. query_param_count
-    query_param_count = len(request.query_params)
+    query_params = getattr(request, "query_params", {})
+    query_param_count = len(query_params) if query_params else 0
     
     # 8. header_count
-    header_count = len(request.headers)
+    header_count = len(headers) if headers else 0
     
     # 9. user_agent_hash
-    user_agent = request.headers.get("user-agent", "")
-    user_agent_hash = deterministic_hash(user_agent, 10000) if user_agent else 0
+    ua = headers.get("user-agent", headers.get("User-Agent", ""))
+    user_agent_hash = int(hashlib.md5(ua.encode()).hexdigest(), 16) % 10000
     
     # 10. content_type_hash
-    content_type = request.headers.get("content-type", "")
-    content_type_hash = deterministic_hash(content_type, 1000) if content_type else 0
+    ct = headers.get("content-type", headers.get("Content-Type", ""))
+    content_type_hash = int(hashlib.md5(ct.encode()).hexdigest(), 16) % 1000
     
     features = [
         ip_hash,
         endpoint_hash,
         http_method,
-        payload_size_bytes,
+        payload_size,
         hour_of_day,
         is_weekend,
         query_param_count,
@@ -69,38 +64,25 @@ def extract_features(request: Request) -> np.ndarray:
     return np.array(features, dtype=np.float32)
 
 if __name__ == "__main__":
-    # Mock a FastAPI Request using Starlette scope semantics
-    mock_scope = {
-        "type": "http",
-        "client": ("192.168.1.100", 8000),
-        "method": "POST",
-        "path": "/api/v1/predict",
-        "headers": [
-            (b"content-type", b"application/json"),
-            (b"user-agent", b"test-agent/1.0"),
-            (b"content-length", b"128"),
-        ],
-        "query_string": b"param1=value1&param2=value2",
-    }
-    mock_request = Request(mock_scope)
+    # Mock test — create a fake request-like object and verify output
+    class MockHeaders(dict):
+        def get(self, key, default=None): return super().get(key, default)
     
-    # Extract features
-    features_array = extract_features(mock_request)
+    class MockRequest:
+        client = type("C", (), {"host": "192.168.1.1"})()
+        url = type("U", (), {"path": "/api/items"})()
+        method = "GET"
+        query_params = {"page": "1", "limit": "10"}
+        headers = MockHeaders({
+            "content-length": "256",
+            "user-agent": "Mozilla/5.0",
+            "content-type": "application/json"
+        })
     
-    print("Requested Path:", mock_request.url.path)
-    print("Method:", mock_request.method)
-    print("Headers:", mock_request.headers.items())
-    print("\n--- Extracted Features ---")
-    
-    feature_names = [
-        "ip_hash", "endpoint_hash", "http_method", "payload_size_bytes",
-        "hour_of_day", "is_weekend", "query_param_count", "header_count",
-        "user_agent_hash", "content_type_hash"
-    ]
-    
-    for name, value in zip(feature_names, features_array):
-        print(f"{name:20}: {value}")
-        
-    print(f"\nArray Shape: {features_array.shape}")
-    print(f"Array Dtype: {features_array.dtype}")
-    print("Raw Output:", features_array)
+    features = extract_features(MockRequest())
+    print("Feature array:", features)
+    print("Shape:", features.shape)
+    print("Dtype:", features.dtype)
+    assert features.shape == (10,), "Shape must be (10,)"
+    assert features.dtype == np.float32, "Dtype must be float32"
+    print("All assertions passed.")
