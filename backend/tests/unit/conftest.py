@@ -39,14 +39,17 @@ def fake_redis(monkeypatch):
     """
     fake = fakeredis.FakeRedis(decode_responses=True)
     monkeypatch.setattr(cache, "redis_client", fake)
-    
+
     # Also mock the async rate limiter so it doesn't try to connect to a real Redis server
     try:
         import gateway.rate_limiter as rate_limiter
-        monkeypatch.setattr(rate_limiter, "check_rate_limits", AsyncMock(return_value=(True, "", 0)))
+
+        monkeypatch.setattr(
+            rate_limiter, "check_rate_limits", AsyncMock(return_value=(True, "", 0))
+        )
     except ImportError:
         pass
-        
+
     yield
 
 
