@@ -5,6 +5,7 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from unittest.mock import AsyncMock
 
 from app.core import cache
 from app.core.database import Base, get_db
@@ -38,6 +39,14 @@ def fake_redis(monkeypatch):
     """
     fake = fakeredis.FakeRedis(decode_responses=True)
     monkeypatch.setattr(cache, "redis_client", fake)
+    
+    # Also mock the async rate limiter so it doesn't try to connect to a real Redis server
+    try:
+        import gateway.rate_limiter as rate_limiter
+        monkeypatch.setattr(rate_limiter, "check_rate_limits", AsyncMock(return_value=(True, "", 0)))
+    except ImportError:
+        pass
+        
     yield
 
 
