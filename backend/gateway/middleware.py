@@ -14,7 +14,7 @@ class GatewayMiddleware(BaseHTTPMiddleware):
             "/auth/signup",
             "/docs",
             "/openapi.json",
-            "/redoc"
+            "/redoc",
         ]
         if request.url.path in public_paths:
             return await call_next(request)
