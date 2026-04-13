@@ -8,8 +8,15 @@ from .rate_limiter import check_rate_limits
 
 class GatewayMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Do NOT break the existing /health endpoint
-        if request.url.path == "/health":
+        public_paths = [
+            "/health",
+            "/auth/login",
+            "/auth/signup",
+            "/docs",
+            "/openapi.json",
+            "/redoc"
+        ]
+        if request.url.path in public_paths:
             return await call_next(request)
 
         # 1. REQUEST INTERCEPTOR: Auth check

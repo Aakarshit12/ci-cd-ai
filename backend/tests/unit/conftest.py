@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 from app.core import cache
 from app.core.database import Base, get_db
+from app.core.security import create_access_token
 from app.main import app
 
 # Ensure the application knows it's running under unit tests
@@ -62,3 +63,10 @@ def client(db):
         yield test_client
 
     app.dependency_overrides.clear()
+
+
+@pytest.fixture(scope="function")
+def auth_headers():
+    """Returns headers with a valid test JWT."""
+    token = create_access_token({"sub": "999"})
+    return {"Authorization": f"Bearer {token}"}
