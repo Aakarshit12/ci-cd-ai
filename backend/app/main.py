@@ -25,9 +25,14 @@ app = FastAPI(title="AI CI/CD Backend")
 # Instrument the app to expose default Prometheus metrics
 Instrumentator().instrument(app).expose(app)
 
+from app.api import ai, requests
+from app.api.auth import router as auth_router
+from gateway.router import router as gateway_router
+
 app.include_router(auth_router)
 app.include_router(ai.router)
 app.include_router(requests.router)
+app.include_router(gateway_router, prefix="/gateway/services", tags=["gateway"])
 
 app.add_middleware(
     CORSMiddleware,
@@ -113,6 +118,8 @@ def init_db(max_retries: int = 10, delay_seconds: float = 2.0) -> None:
 # 🔥 MUST RUN AFTER MODEL IMPORT
 
 
+from gateway.health_check import start_health_check_task
+
 @app.on_event("startup")
 def startup_event():
     # Avoid touching the real database during unit tests
@@ -120,6 +127,7 @@ def startup_event():
     # run with TESTING unset/false to exercise init_db().
     if not is_testing():
         init_db()
+        start_health_check_task()
 
 
 @app.get("/health")
