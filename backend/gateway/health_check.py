@@ -36,11 +36,7 @@ async def health_check_task():
 def _perform_health_checks():
     db = SessionLocal()
     try:
-        services = (
-            db.query(RegisteredService)
-            .filter(RegisteredService.is_active)
-            .all()
-        )
+        services = db.query(RegisteredService).filter(RegisteredService.is_active).all()
         for service in services:
             for url in service.upstream_urls:
                 is_healthy = check_url_health(url)
