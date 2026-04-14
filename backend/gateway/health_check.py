@@ -24,7 +24,8 @@ async def health_check_task():
     logger.info("Starting background health check task...")
     while True:
         try:
-            # Run the blocking DB call in a thread pool (using thread fallback for simplicity)
+            # Run the blocking DB call in a thread pool (using thread fallback for
+            #  simplicity)
             await asyncio.to_thread(_perform_health_checks)
         except Exception as e:
             logger.error(f"Error in health check task: {e}")

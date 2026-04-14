@@ -1,9 +1,5 @@
 import os
 import sys
-
-# Add the backend directory to python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
@@ -17,7 +13,8 @@ from app.core.database import Base
 from app.models.user import User  # noqa: F401
 from app.models.request import Request  # noqa: F401
 from gateway.models import RegisteredService  # noqa: F401
-
+# Add the backend directory to python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
