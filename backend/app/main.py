@@ -15,6 +15,8 @@ from app.core.database import Base, engine
 from app.core.errors import db_exception_handler
 from app.core.logging import setup_logging
 from gateway.middleware import GatewayMiddleware
+from gateway.router import router as gateway_router
+from gateway.health_check import start_health_check_task
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -24,10 +26,6 @@ app = FastAPI(title="AI CI/CD Backend")
 
 # Instrument the app to expose default Prometheus metrics
 Instrumentator().instrument(app).expose(app)
-
-from app.api import ai, requests
-from app.api.auth import router as auth_router
-from gateway.router import router as gateway_router
 
 app.include_router(auth_router)
 app.include_router(ai.router)
@@ -117,8 +115,6 @@ def init_db(max_retries: int = 10, delay_seconds: float = 2.0) -> None:
 
 # 🔥 MUST RUN AFTER MODEL IMPORT
 
-
-from gateway.health_check import start_health_check_task
 
 @app.on_event("startup")
 def startup_event():

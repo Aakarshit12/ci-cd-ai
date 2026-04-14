@@ -1,9 +1,22 @@
+import os
+import sys
+
+# Add the backend directory to python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 from logging.config import fileConfig
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
+
+from app.core.config import DATABASE_URL
+from app.core.database import Base
+# Existing models
+from app.models.user import User  # noqa: F401
+from app.models.request import Request  # noqa: F401
+from gateway.models import RegisteredService  # noqa: F401
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -13,20 +26,6 @@ config = context.config
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
-
-import os
-import sys
-
-# Add the backend directory to python path
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
-from app.core.config import DATABASE_URL
-from app.core.database import Base
-# Existing models
-from app.models.user import User
-from app.models.request import Request
-# New Gateway models
-from gateway.models import RegisteredService
 
 config.set_main_option("sqlalchemy.url", str(DATABASE_URL))
 
@@ -78,9 +77,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
